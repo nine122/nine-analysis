@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 const app = express();
 app.use(
   cors({
-    origin: "https://nine-analysis.vercel.app/",
+    origin: "http://localhost:5173",
   })
 );
 const mongoURL =
@@ -16,7 +16,7 @@ const mongoURL =
 mongoose.connect(mongoURL).then(() => {
   console.log("connected to db");
   app.listen(process.env.PORT, () => {
-    console.log("app is listening on the" + process.env.PORT);
+    console.log("app is listening on " + process.env.PORT);
   });
 });
 
