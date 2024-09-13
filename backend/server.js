@@ -16,7 +16,7 @@ const mongoURL =
 mongoose.connect(mongoURL).then(() => {
   console.log("connected to db");
   app.listen(process.env.PORT, () => {
-    console.log("app is listening on " + process.env.PORT);
+    console.log("app is listening on the" + process.env.PORT);
   });
 });
 
