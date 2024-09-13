@@ -9,7 +9,9 @@ export default function MovieDetail() {
   useEffect(() => {
     let fetchMovie = async () => {
       if (id) {
-        let res = await axios.get("http://localhost:8000/api/difference/" + id);
+        let res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/difference/` + id
+        );
         if (res.status === 200) {
           setMatch(res.data);
         }

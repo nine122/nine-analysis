@@ -49,7 +49,7 @@ export default function Calculate() {
     // Post the data to the API
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/difference",
+        `${import.meta.env.VITE_BACKEND_URL}/api/difference`,
         {
           hometeam: homeTeam,
           awayteam: awayTeam,

@@ -11,7 +11,9 @@ function App() {
     // Fetch data from the API
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/difference");
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/difference`
+        );
 
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
