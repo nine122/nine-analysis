@@ -1,16 +1,39 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 
-export default function Calculate() {
+export default function EditDetail() {
   // State for Home Team and Away Team
   const [homeTeam, setHomeTeam] = useState("");
   const [awayTeam, setAwayTeam] = useState("");
   const [body, setBody] = useState("");
   const [total, setTotal] = useState("");
+  const [probability, setProbability] = useState([]);
+  const [odds, setOdds] = useState([]);
+
   const navigate = useNavigate();
   const location = useLocation();
-  const { roundId, league, round } = location.state || {};
+  const { roundId, id, round, league } = location.state || {};
+
+  useEffect(() => {
+    let fetchRecipe = async () => {
+      if (id) {
+        let res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/matches/${roundId}/` + id
+        );
+        if (res.status === 200) {
+          console.log(res);
+          setHomeTeam(res.data.hometeam);
+          setAwayTeam(res.data.awayteam);
+          setProbability(res.data.probability);
+          setOdds(res.data.probability);
+          setBody(res.data.body);
+          setTotal(res.data.total);
+        }
+      }
+    };
+    fetchRecipe();
+  }, [id]);
 
   // Refs for Probability inputs
   const w1Ref = useRef(null);
@@ -49,11 +72,13 @@ export default function Calculate() {
     ];
     const link = `${
       import.meta.env.VITE_BACKEND_URL
-    }/api/matches/${roundId}/create-match`;
+    }/api/matches/${roundId}/${id}`;
+
+    console.log(link);
 
     // Post the data to the API
     try {
-      const response = await axios.post(link, {
+      const response = await axios.patch(link, {
         hometeam: homeTeam,
         awayteam: awayTeam,
         body,
@@ -63,7 +88,7 @@ export default function Calculate() {
       });
       console.log("Data posted successfully:", response.data);
       navigate("/match", {
-        state: { roundId, league, round },
+        state: { roundId, round, league },
       });
     } catch (error) {
       console.error("Error posting data:", error);
@@ -117,18 +142,21 @@ export default function Calculate() {
           <input
             type="number"
             ref={w1Ref}
+            value={probability[0]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="W1"
           />
           <input
             type="number"
             ref={xRef}
+            value={probability[1]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="X"
           />
           <input
             type="number"
             ref={w2Ref}
+            value={probability[2]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="W2"
           />
@@ -137,6 +165,7 @@ export default function Calculate() {
           <input
             type="number"
             ref={bttsYesRef}
+            value={probability[3]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="btts-yes"
           />
@@ -146,12 +175,14 @@ export default function Calculate() {
           <input
             type="number"
             ref={over2_5Ref}
+            value={probability[4]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="over2.5"
           />
           <input
             type="number"
             ref={under2_5Ref}
+            value={probability[5]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="under2.5"
           />
@@ -167,18 +198,21 @@ export default function Calculate() {
           <input
             type="number"
             ref={oddsW1Ref}
+            value={odds[0]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="W1"
           />
           <input
             type="number"
             ref={oddsXRef}
+            value={odds[1]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="X"
           />
           <input
             type="number"
             ref={oddsW2Ref}
+            value={odds[2]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="W2"
           />
@@ -188,6 +222,7 @@ export default function Calculate() {
           <input
             type="number"
             ref={oddsBttsYesRef}
+            value={odds[3]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="btts-yes"
           />
@@ -197,12 +232,14 @@ export default function Calculate() {
           <input
             type="number"
             ref={oddsOver2_5Ref}
+            value={odds[4]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="over2.5"
           />
           <input
             type="number"
             ref={oddsUnder2_5Ref}
+            value={odds[5]}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="under2.5"
           />
@@ -240,7 +277,7 @@ export default function Calculate() {
         onClick={handleSubmit}
         className="bg-green-600 m-2 md:m-4 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-md shadow-md hover:bg-green-700 border-2 border-white md:order-3"
       >
-        Calculate
+        Update
       </button>
     </div>
   );

@@ -1,22 +1,24 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function MovieDetail() {
-  let { id } = useParams();
+  let { roundId, id } = useParams();
   let [match, setMatch] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     let fetchMovie = async () => {
-      if (id) {
+      if (id && roundId) {
         let res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/difference/` + id
+          `${import.meta.env.VITE_BACKEND_URL}/api/matches/${roundId}/` + id
         );
         if (res.status === 200) {
           setMatch(res.data);
         }
       }
     };
+
     fetchMovie();
   }, [id]);
 
@@ -39,9 +41,11 @@ export default function MovieDetail() {
               return (
                 <li
                   key={index}
-                  className="text-lg flex flex-row bg-stone-300 gap-2 md:gap-7 p-6 rounded-lg items-center justify-around md:justify-center"
+                  className="text-lg flex flex-row bg-stone-300  md:gap-7 p-5 rounded-lg items-center justify-between md:justify-center"
                 >
-                  <strong>{label[index]}: </strong>
+                  <strong className="text-sm md:text-xl text-left">
+                    {label[index]}:
+                  </strong>
                   <div className="flex flex-col gap-2 items-center">
                     <strong className="text-sm md:text-xl">
                       Probability: {probability}%
@@ -51,7 +55,7 @@ export default function MovieDetail() {
                     </strong>
                   </div>
                   <strong
-                    className={`${
+                    className={`text-sm md:text-xl ${
                       difference > 0 ? "bg-green-500" : "text-red-600"
                     }`}
                   >
@@ -63,18 +67,18 @@ export default function MovieDetail() {
         </ul>
 
         <div className="mt-7 flex flex-row justify-center items-center">
-          <Link
-            to="/"
+          <button
+            onClick={() => navigate(-1)}
             className="text-white font-bold py-1 md:py-3 px-4 md:px-6 text-xl mx-3"
           >
-            Home
-          </Link>
-          <Link
-            to={"/calculate"}
+            Back
+          </button>
+          <button
+            onClick={() => navigate(-1)}
             className="bg-stone-700 text-white font-bold py-1 md:py-3 px-4 md:px-6 rounded-md shadow-md hover:bg-green-700 border-2 border-white md:order-3"
           >
             Calculate Another Match
-          </Link>
+          </button>
         </div>
       </div>
     </>

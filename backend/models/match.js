@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const DifferencesSchema = new Schema(
+const MatchSchema = new Schema(
   {
     hometeam: {
       type: String,
@@ -27,10 +27,19 @@ const DifferencesSchema = new Schema(
       type: [Number], // Array of numbers
       required: true,
     },
+    roundId: { type: Schema.Types.ObjectId, ref: "Round", required: true },
+    result: {
+      type: String,
+      required: false,
+    },
+    iswon: {
+      type: Boolean,
+      requird: false,
+    },
   },
   { timestamps: true }
 );
 
-const Differences = mongoose.model("Difference", DifferencesSchema);
+const Match = mongoose.model("Match", MatchSchema);
 
-module.exports = Differences;
+module.exports = Match;
