@@ -1,5 +1,5 @@
 const Match = require("../models/Match"); // Consistent naming
-const Round = require("../models/Round"); // Consistent naming
+const Round = require("../models/round"); // Consistent naming
 const mongoose = require("mongoose");
 
 const matchController = {
