@@ -1,4 +1,4 @@
-const Match = require("../models/Match"); // Consistent naming
+const Match = require("../models/match"); // Consistent naming
 const Round = require("../models/round"); // Consistent naming
 const mongoose = require("mongoose");
 
