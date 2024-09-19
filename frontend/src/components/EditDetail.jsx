@@ -26,7 +26,7 @@ export default function EditDetail() {
           setHomeTeam(res.data.hometeam);
           setAwayTeam(res.data.awayteam);
           setProbability(res.data.probability);
-          setOdds(res.data.probability);
+          setOdds(res.data.odds);
           setBody(res.data.body);
           setTotal(res.data.total);
         }
