@@ -1,82 +1,106 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function Edit() {
+const Edit = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [iswon, setIswon] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { roundId, league, round } = location.state || {};
   const label = ["W1", "X", "W2", "BTTS", "Over2.5", "Under2.5"];
-  const [result, setResult] = useState("");
-
-  const postResult = async (id) => {
-    if (id) {
-      try {
-        const response = await axios.patch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/matches/${roundId}/` + id,
-          {
-            result,
-            iswon,
-          }
-        );
-        console.log("result posted successfully:", response.data);
-        alert("result recorded");
-      } catch (error) {
-        console.error("Error posting data:", error);
-      }
-    }
-  };
 
   useEffect(() => {
-    // Fetch data from the API
     const fetchData = async () => {
       try {
         const response = await fetch(
           `${import.meta.env.VITE_BACKEND_URL}/api/matches/${roundId}`
         );
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
         const result = await response.json();
-        setData(result); // Update state with the result
+        setData(result);
       } catch (err) {
-        setError(err.message); // Update error state if something goes wrong
+        setError(err.message);
       } finally {
-        setLoading(false); // Stop loading once the fetch completes
+        setLoading(false);
       }
     };
+    fetchData();
+  }, [roundId]);
 
-    fetchData(); // Call the async function
-  }, []); // Empty dependency array means this runs once when the component mounts
-
-  // Render the data, error, or loading message
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-
-  let deleteMatch = async (id) => {
-    var text = "are you sure want to delete this match?";
-    if (confirm(text) === true) {
+  const deleteMatch = async (id) => {
+    if (window.confirm("Are you sure you want to delete this match?")) {
       try {
-        const res = await axios.delete(
+        await axios.delete(
           `${import.meta.env.VITE_BACKEND_URL}/api/matches/${roundId}/${id}`
         );
-        if (res.status === 200) {
-          console.log("Match deleted");
-
-          // Optionally, you can refetch the data or update the state to reflect the change
-          setData(data.filter((match) => match._id !== id));
-        }
+        setData(data.filter((match) => match._id !== id));
       } catch (err) {
         console.error("Error deleting match:", err.message);
       }
     }
   };
+
+  const saveResult = async (id, result, iswon) => {
+    if (id) {
+      try {
+        const response = await axios.patch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/matches/${roundId}/${id}`,
+          {
+            result,
+            iswon,
+          }
+        );
+        console.log("Result saved successfully:", response.data);
+        alert("Result saved");
+        setData(
+          data.map((match) =>
+            match._id === id
+              ? { ...match, result, iswon, unsavedChanges: false }
+              : match
+          )
+        );
+      } catch (error) {
+        console.error("Error saving data:", error);
+      }
+    }
+  };
+
+  const handleResultChange = (id, result) => {
+    setData(
+      data.map((match) =>
+        match._id === id ? { ...match, result, unsavedChanges: true } : match
+      )
+    );
+  };
+
+  const handleWonLostChange = (id, newStatus) => {
+    setData(
+      data.map((match) =>
+        match._id === id
+          ? {
+              ...match,
+              iswon: match.iswon === newStatus ? null : newStatus,
+              unsavedChanges: true,
+            }
+          : match
+      )
+    );
+  };
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex justify-center items-center h-screen text-red-500">
+        Error: {error}
+      </div>
+    );
 
   return (
     <div className="flex flex-col mx-4 md:mx-20 my-4 md:my-10 space-y-2 md:space-y-0 gap-2 md:gap-6 ">
@@ -111,104 +135,118 @@ function Edit() {
         </div>
       </nav>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 h-44 md:h-52">
-        {data.length > 0 &&
-          data.map((d) => (
+      <div className="p-4 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
+          {data.map((match) => (
             <div
-              key={d._id} // Assign key to the outer div
-              className="bg-blue-300 p-4 flex flex-col gap-2 rounded-lg border border-gray-200 shadow-md "
+              key={match._id}
+              className={`rounded-lg shadow-md p-6 space-y-4 ${
+                match.iswon === true
+                  ? "bg-green-100"
+                  : match.iswon === false
+                  ? "bg-red-100"
+                  : "bg-white"
+              }`}
             >
-              <div className="flex flex-row justify-between">
-                <h1 className="text-md md:text-xl font-bold">{d.hometeam}</h1>
-                <h1 className="text-md md:text-xl font-bold">{d.awayteam}</h1>
-              </div>
-              <div className="flex justify-center gap-3">
-                <div className="bg-purple-800 px-2 py-2 rounded-full w-10 h-10 text-white text-sm flex justify-center items-center">
-                  {d.body}
+              <div className="flex justify-between items-center">
+                <h2 className="font-bold text-lg">
+                  {match.hometeam} vs {match.awayteam}
+                </h2>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() =>
+                      navigate("/edit-detail", {
+                        state: { roundId, id: match._id, round, league },
+                      })
+                    }
+                    className="text-blue-500 font-bold"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteMatch(match._id)}
+                    className="text-red-500 font-bold"
+                  >
+                    Delete
+                  </button>
                 </div>
-                <div className="bg-purple-800 px-2 py-2 rounded-full w-10 h-10 text-white text-sm flex justify-center items-center">
-                  {d.total}
-                </div>
               </div>
-              <ul className="bg-stone-200 flex flex-col items-center gap-0.5 md:gap-0">
-                {d.odds.map((odd, index) => {
-                  const probability = d.probability[index]; // Get the corresponding probability value
-                  const difference = ((1 / odd) * 100).toFixed(2) - probability; // Subtract the two values
 
+              <div className="flex justify-center space-x-6">
+                <span className="bg-purple-600 text-white rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center text-md md:text-lg">
+                  {match.body}
+                </span>
+                <span className="bg-purple-600 text-white rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center text-md md:text-lg">
+                  {match.total}
+                </span>
+              </div>
+
+              <div className="bg-gray-200 p-3 rounded text-center space-y-1">
+                {match.odds.map((odd, index) => {
+                  const probability = match.probability[index];
+                  const difference = ((1 / odd) * 100).toFixed(2) - probability;
                   return (
                     difference > 0 && (
-                      <li key={index} className="text-sm md:text-lg">
-                        <strong>{label[index]}: </strong>
-                        {difference.toFixed()}
-                      </li>
+                      <div key={index} className="text-sm">
+                        <strong>{label[index]}:</strong> {difference.toFixed()}
+                      </div>
                     )
                   );
                 })}
-              </ul>
-              <div className="flex justify-between items-center">
-                <div className="flex flex-row gap-1 items-center mr-5">
-                  <div
-                    onClick={() =>
-                      navigate("/edit-detail", {
-                        state: { roundId, id: d._id, round, league },
-                      })
-                    }
-                    className=" text-black font-bold py-1 md:py-3 px-4 md:px-6 text-md cursor-pointer"
-                  >
-                    Edit
-                  </div>
-                  <div
-                    className="bg-red-500 px-4 py-2 rounded-lg text-white text-sm cursor-pointer"
-                    onClick={() => deleteMatch(d._id)} // Pass the correct match ID to delete
-                  >
-                    delete
-                  </div>
-                </div>
-
-                <div className="flex gap-4 items-center">
-                  <input
-                    type="text"
-                    className="appearance-none border bg-stone-200 rounded w-12 md:w-16 h-8 md:h-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-center"
-                    placeholder="result"
-                    value={d.result}
-                    onChange={(e) => setResult(e.target.value)}
-                  />
-                  <div className="">
-                    <label className="flex items-center space-x-1 ">
-                      <input
-                        type="radio"
-                        name="result"
-                        value={iswon}
-                        onChange={(e) => e.target.value(setIswon(true))}
-                        className="appearance-none w-5 h-5 rounded-full checked:bg-green-600 border border-gray-400"
-                      />
-                      <span>Won</span>
-                    </label>
-
-                    <label className="flex items-center space-x-1">
-                      <input
-                        type="radio"
-                        name="result"
-                        value={iswon}
-                        onChange={(e) => e.target.value(setIswon(false))}
-                        className="appearance-none w-5 h-5 rounded-full checked:bg-red-600 border border-gray-400"
-                      />
-                      <span>Lost</span>
-                    </label>
-                  </div>
-                </div>
-                <button
-                  className="bg-green-500 rounded-lg px-4 py-2 text white mx-1 my-2"
-                  onClick={() => postResult(d._id)}
-                >
-                  Save
-                </button>
               </div>
+
+              <div className="flex items-center justify-between mt-4">
+                <input
+                  type="text"
+                  className="border rounded p-1 w-20 text-center text-lg"
+                  placeholder="Result"
+                  value={match.result || ""}
+                  onChange={(e) =>
+                    handleResultChange(match._id, e.target.value)
+                  }
+                />
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => handleWonLostChange(match._id, true)}
+                    className={`rounded px-4 py-2 text-sm ${
+                      match.iswon === true
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-300"
+                    }`}
+                  >
+                    Won
+                  </button>
+                  <button
+                    onClick={() => handleWonLostChange(match._id, false)}
+                    className={`rounded px-4 py-2 text-sm ${
+                      match.iswon === false
+                        ? "bg-red-500 text-white"
+                        : "bg-gray-300"
+                    }`}
+                  >
+                    Lost
+                  </button>
+                </div>
+              </div>
+
+              {match.unsavedChanges && (
+                <div className="flex justify-end mt-4">
+                  <button
+                    onClick={() =>
+                      saveResult(match._id, match.result, match.iswon)
+                    }
+                    className="bg-blue-500 text-white rounded-lg px-4 md:px-6 py-1 md:py-2 text-sm"
+                  >
+                    Save
+                  </button>
+                </div>
+              )}
             </div>
           ))}
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default Edit;

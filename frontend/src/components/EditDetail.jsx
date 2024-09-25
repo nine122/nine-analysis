@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 
@@ -8,8 +8,8 @@ export default function EditDetail() {
   const [awayTeam, setAwayTeam] = useState("");
   const [body, setBody] = useState("");
   const [total, setTotal] = useState("");
-  const [probability, setProbability] = useState([]);
-  const [odds, setOdds] = useState([]);
+  const [probability, setProbability] = useState(new Array(6).fill(""));
+  const [odds, setOdds] = useState(new Array(6).fill(""));
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,11 +22,10 @@ export default function EditDetail() {
           `${import.meta.env.VITE_BACKEND_URL}/api/matches/${roundId}/` + id
         );
         if (res.status === 200) {
-          console.log(res);
           setHomeTeam(res.data.hometeam);
           setAwayTeam(res.data.awayteam);
-          setProbability(res.data.probability);
-          setOdds(res.data.odds);
+          setProbability(res.data.probability || new Array(6).fill(""));
+          setOdds(res.data.odds || new Array(6).fill(""));
           setBody(res.data.body);
           setTotal(res.data.total);
         }
@@ -35,48 +34,11 @@ export default function EditDetail() {
     fetchRecipe();
   }, [id]);
 
-  // Refs for Probability inputs
-  const w1Ref = useRef(null);
-  const xRef = useRef(null);
-  const w2Ref = useRef(null);
-  const over2_5Ref = useRef(null);
-  const under2_5Ref = useRef(null);
-  const bttsYesRef = useRef(null);
-
-  // Refs for Odds inputs
-  const oddsW1Ref = useRef(null);
-  const oddsXRef = useRef(null);
-  const oddsW2Ref = useRef(null);
-  const oddsOver2_5Ref = useRef(null);
-  const oddsUnder2_5Ref = useRef(null);
-  const oddsBttsYesRef = useRef(null);
-
   const handleSubmit = async () => {
-    // Collect data from inputs
-    const probability = [
-      w1Ref.current.value,
-      xRef.current.value,
-      w2Ref.current.value,
-      bttsYesRef.current.value,
-      over2_5Ref.current.value,
-      under2_5Ref.current.value,
-    ];
-
-    const odds = [
-      oddsW1Ref.current.value,
-      oddsXRef.current.value,
-      oddsW2Ref.current.value,
-      oddsBttsYesRef.current.value,
-      oddsOver2_5Ref.current.value,
-      oddsUnder2_5Ref.current.value,
-    ];
     const link = `${
       import.meta.env.VITE_BACKEND_URL
     }/api/matches/${roundId}/${id}`;
 
-    console.log(link);
-
-    // Post the data to the API
     try {
       const response = await axios.patch(link, {
         hometeam: homeTeam,
@@ -106,8 +68,9 @@ export default function EditDetail() {
           <h1>Back to Home</h1>
         </Link>
       </nav>
+
       {/* Team Name */}
-      <div className="flex flex-row gap-5  p-6 rounded-lg shadow-lg w-full max-w-sm">
+      <div className="flex flex-row gap-5 p-6 rounded-lg shadow-lg w-full max-w-sm">
         <div className="mb-2">
           <input
             id="input1"
@@ -136,27 +99,39 @@ export default function EditDetail() {
       {/* Probability */}
       <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-sm">
         <div className="my-2">
-          <h1 className="text-2xl font-bold">Probability </h1>
+          <h1 className="text-2xl font-bold">Probability</h1>
         </div>
         <div className="flex gap-2 mb-4">
           <input
             type="number"
-            ref={w1Ref}
             value={probability[0]}
+            onChange={(e) => {
+              const newProbabilities = [...probability];
+              newProbabilities[0] = e.target.value;
+              setProbability(newProbabilities);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="W1"
           />
           <input
             type="number"
-            ref={xRef}
             value={probability[1]}
+            onChange={(e) => {
+              const newProbabilities = [...probability];
+              newProbabilities[1] = e.target.value;
+              setProbability(newProbabilities);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="X"
           />
           <input
             type="number"
-            ref={w2Ref}
             value={probability[2]}
+            onChange={(e) => {
+              const newProbabilities = [...probability];
+              newProbabilities[2] = e.target.value;
+              setProbability(newProbabilities);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="W2"
           />
@@ -164,8 +139,12 @@ export default function EditDetail() {
         <div className="mb-4">
           <input
             type="number"
-            ref={bttsYesRef}
             value={probability[3]}
+            onChange={(e) => {
+              const newProbabilities = [...probability];
+              newProbabilities[3] = e.target.value;
+              setProbability(newProbabilities);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="btts-yes"
           />
@@ -174,15 +153,23 @@ export default function EditDetail() {
         <div className="mb-4 flex flex-row gap-11">
           <input
             type="number"
-            ref={over2_5Ref}
             value={probability[4]}
+            onChange={(e) => {
+              const newProbabilities = [...probability];
+              newProbabilities[4] = e.target.value;
+              setProbability(newProbabilities);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="over2.5"
           />
           <input
             type="number"
-            ref={under2_5Ref}
             value={probability[5]}
+            onChange={(e) => {
+              const newProbabilities = [...probability];
+              newProbabilities[5] = e.target.value;
+              setProbability(newProbabilities);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="under2.5"
           />
@@ -192,27 +179,39 @@ export default function EditDetail() {
       {/* Odds */}
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
         <div className="my-2">
-          <h1 className="text-2xl font-bold">Odds </h1>
+          <h1 className="text-2xl font-bold">Odds</h1>
         </div>
         <div className="flex gap-2 mb-4">
           <input
             type="number"
-            ref={oddsW1Ref}
             value={odds[0]}
+            onChange={(e) => {
+              const newOdds = [...odds];
+              newOdds[0] = e.target.value;
+              setOdds(newOdds);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="W1"
           />
           <input
             type="number"
-            ref={oddsXRef}
             value={odds[1]}
+            onChange={(e) => {
+              const newOdds = [...odds];
+              newOdds[1] = e.target.value;
+              setOdds(newOdds);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="X"
           />
           <input
             type="number"
-            ref={oddsW2Ref}
             value={odds[2]}
+            onChange={(e) => {
+              const newOdds = [...odds];
+              newOdds[2] = e.target.value;
+              setOdds(newOdds);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="W2"
           />
@@ -221,8 +220,12 @@ export default function EditDetail() {
         <div className="mb-4">
           <input
             type="number"
-            ref={oddsBttsYesRef}
             value={odds[3]}
+            onChange={(e) => {
+              const newOdds = [...odds];
+              newOdds[3] = e.target.value;
+              setOdds(newOdds);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="btts-yes"
           />
@@ -231,51 +234,53 @@ export default function EditDetail() {
         <div className="mb-4 flex flex-row gap-11">
           <input
             type="number"
-            ref={oddsOver2_5Ref}
             value={odds[4]}
+            onChange={(e) => {
+              const newOdds = [...odds];
+              newOdds[4] = e.target.value;
+              setOdds(newOdds);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="over2.5"
           />
           <input
             type="number"
-            ref={oddsUnder2_5Ref}
             value={odds[5]}
+            onChange={(e) => {
+              const newOdds = [...odds];
+              newOdds[5] = e.target.value;
+              setOdds(newOdds);
+            }}
             className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="under2.5"
           />
         </div>
-        <div>
-          <div className="mt-4 flex justify-around">
-            <strong>Body</strong>
-            <strong>Total</strong>
-          </div>
-          <div className="mb-4 flex flex-row gap-11">
-            <input
-              id="body"
-              type="text"
-              className="appearance-none border rounded max-w-36 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Body"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              required
-            />
-            <input
-              id="total"
-              type="text"
-              className="appearance-none border rounded max-w-36 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Total"
-              value={total}
-              onChange={(e) => setTotal(e.target.value)}
-              required
-            />
-          </div>
-        </div>
       </div>
 
-      {/* button */}
+      <div className="mt-4 flex justify-around">
+        <input
+          id="input1"
+          type="text"
+          className="appearance-none border rounded max-w-36 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          placeholder="Body"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          required
+        />
+        <input
+          id="input2"
+          type="text"
+          className="appearance-none border rounded max-w-36 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          placeholder="Total"
+          value={total}
+          onChange={(e) => setTotal(e.target.value)}
+          required
+        />
+      </div>
+
       <button
         onClick={handleSubmit}
-        className="bg-green-600 m-2 md:m-4 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-md shadow-md hover:bg-green-700 border-2 border-white md:order-3"
+        className="bg-green-600 m-2 md:m-4 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-md shadow-md hover:bg-green-700"
       >
         Update
       </button>

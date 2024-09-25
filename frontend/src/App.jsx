@@ -133,7 +133,7 @@ function App() {
                         {d.total}
                       </div>
                     </div>
-                    <ul className="bg-stone-200 flex flex-col items-center gap-0.5 md:gap-0">
+                    <ul className="bg-white flex flex-col rounded-lg items-center gap-0.5 md:gap-0">
                       {d.odds.map((odd, index) => {
                         const probability = d.probability[index]; // Get the corresponding probability value
                         const difference =
