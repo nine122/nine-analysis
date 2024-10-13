@@ -18,6 +18,8 @@ router.post(
       "Serie A",
       "International",
       "UCL",
+      "UEL",
+      "Ligue1",
       "Others",
     ]),
     body("roundNumber"),

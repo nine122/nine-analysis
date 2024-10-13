@@ -6,8 +6,10 @@ const leagues = [
   "La Liga",
   "Bundesliga",
   "Serie A",
-  "UCL",
   "International",
+  "UCL",
+  "UEL",
+  "Ligue1",
   "Others",
 ];
 

@@ -141,7 +141,12 @@ function App() {
 
                         return (
                           difference > 0 && (
-                            <li key={index} className="text-sm md:text-lg">
+                            <li
+                              key={index}
+                              className={`text-sm md:text-lg m-1 ${
+                                difference > 7 ? "bg-yellow-200" : ""
+                              }`}
+                            >
                               <strong>{label[index]}: </strong>
                               {difference.toFixed(2)}
                             </li>

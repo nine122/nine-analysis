@@ -12,6 +12,8 @@ const RoundSchema = new Schema(
         "Serie A",
         "International",
         "UCL",
+        "UEL",
+        "Ligue1",
         "Others",
       ],
       required: true,
